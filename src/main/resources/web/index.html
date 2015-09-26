@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <script type="text/javascript" src="jquery.min.js"></script>    
+    <script type="text/javascript" src="typeahead.jquery.min.js"></script>
+    <link rel="stylesheet" href="typeahead.css">
+
+    <script type="text/javascript">
+$(function() {
+
+    $.ajax("/M/Title", {
+        dataType: "text",
+        error: function() { console.log(arguments); },
+        success: function(responseText) { document.title = responseText; }
+    });
+
+    var lastResponse;
+    var onSelect = function(item) {
+        var text = $('#suggestbox .typeahead')[1].value;
+        if((item !== undefined) && (text.length > 1) && (item.title.length >= text.length)) {
+            if(text.toUpperCase() == item.title.substring(0, text.length).toUpperCase()) {  
+                window.location.href = "/" + item.docid;
+            }
+        }
+    };
+    $('#suggestbox .typeahead').typeahead({
+        hint: true,
+        highlight: true,
+        minLength: 2
+    },
+    {
+        displayKey: "title",
+        limit: 10,
+        name: 'suggest',
+        async: true,
+        source: function(q, _, cb) {
+            $.ajax("/suggest", {
+                data: { q: q },
+                dataType: "json",
+                error: function() { console.log(arguments); },
+                success: function(responseJson) {
+                    responseJson.sort(function(a, b) {
+                        return a.title.length - b.title.length;
+                    });
+                    lastResponse = responseJson[0];
+                    cb(responseJson);
+                }
+            });
+        }
+    }).on('typeahead:selected', function (_, item) {
+        onSelect(item);
+    }).on('typeahead:cursorchanged', function (_, item) {
+        lastResponse = item;
+    }).on('keydown', function(e) {
+        if(e && e.which == 13) {
+            onSelect(lastResponse);
+        }
+    }).focus();
+});
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <img src="/I/s/Wiki.png">
+        </div>
+        <div id="suggestbox">
+            <input class="typeahead" type="text" placeholder="">
+        </div>
+    </div>
+</body>
+</html>
+
