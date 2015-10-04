@@ -19,11 +19,9 @@ $ cd jaywixz/
 $ mvn compile package
 $ java -jar target/jaywixz-0.1.jar /path/to/archive.txz
 ```
-Using your preferred browser, navigate to [localhost:9090](http://localhost:9090)
-
-or
-
-From a device on the same network, navigate to your.local.ip.addr:9090
+##Usage
+* Using your preferred browser, navigate to [localhost:9090](http://localhost:9090)
+* From a device on the same network, navigate to your.local.ip.addr:9090
 
 Enjoy your local copy of Wikipedia!
 
